@@ -1,0 +1,346 @@
+/* Matrix Terminal 2048 - Special Matrix Effects */
+
+/* Scanlines effect */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    animation: scanlines-move 8s linear infinite;
+}
+
+@keyframes scanlines-move {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(10px);
+    }
+}
+
+/* Matrix rain background effect */
+.matrix-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.1;
+    overflow: hidden;
+}
+
+.matrix-column {
+    position: absolute;
+    top: -100%;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    color: #00ff41;
+    animation: matrix-column-fall linear infinite;
+}
+
+@keyframes matrix-column-fall {
+    0% {
+        top: -100%;
+    }
+    100% {
+        top: 100%;
+    }
+}
+
+/* Terminal cursor blink */
+.terminal-cursor {
+    display: inline-block;
+    width: 10px;
+    height: 20px;
+    background: #00ff41;
+    animation: cursor-blink 1s infinite;
+    margin-left: 2px;
+}
+
+@keyframes cursor-blink {
+    0%, 50% {
+        opacity: 1;
+    }
+    51%, 100% {
+        opacity: 0;
+    }
+}
+
+/* Glitch text effect */
+.glitch {
+    position: relative;
+    animation: glitch-main 2s infinite;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000000;
+}
+
+.glitch::before {
+    animation: glitch-1 0.5s infinite;
+    color: #00ff41;
+    z-index: -1;
+}
+
+.glitch::after {
+    animation: glitch-2 0.5s infinite;
+    color: #00cc33;
+    z-index: -2;
+}
+
+@keyframes glitch-main {
+    0%, 100% {
+        transform: translate(0);
+    }
+    20% {
+        transform: translate(-2px, 2px);
+    }
+    40% {
+        transform: translate(-2px, -2px);
+    }
+    60% {
+        transform: translate(2px, 2px);
+    }
+    80% {
+        transform: translate(2px, -2px);
+    }
+}
+
+@keyframes glitch-1 {
+    0%, 100% {
+        clip: rect(42px, 9999px, 44px, 0);
+        transform: translate(0);
+    }
+    20% {
+        clip: rect(12px, 9999px, 59px, 0);
+        transform: translate(-2px);
+    }
+    40% {
+        clip: rect(48px, 9999px, 29px, 0);
+        transform: translate(-2px);
+    }
+    60% {
+        clip: rect(42px, 9999px, 73px, 0);
+        transform: translate(2px);
+    }
+    80% {
+        clip: rect(33px, 9999px, 47px, 0);
+        transform: translate(2px);
+    }
+}
+
+@keyframes glitch-2 {
+    0%, 100% {
+        clip: rect(65px, 9999px, 100px, 0);
+        transform: translate(0);
+    }
+    20% {
+        clip: rect(25px, 9999px, 80px, 0);
+        transform: translate(2px);
+    }
+    40% {
+        clip: rect(55px, 9999px, 90px, 0);
+        transform: translate(2px);
+    }
+    60% {
+        clip: rect(15px, 9999px, 70px, 0);
+        transform: translate(-2px);
+    }
+    80% {
+        clip: rect(45px, 9999px, 85px, 0);
+        transform: translate(-2px);
+    }
+}
+
+/* Neon glow effect */
+.neon-glow {
+    text-shadow: 
+        0 0 10px #00ff41,
+        0 0 20px #00ff41,
+        0 0 30px #00ff41,
+        0 0 40px #00ff41;
+    animation: neon-flicker 2s infinite alternate;
+}
+
+@keyframes neon-flicker {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}
+
+/* Data stream effect */
+.data-stream {
+    position: absolute;
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    color: #00ff41;
+    opacity: 0;
+    animation: data-flow 3s linear infinite;
+    white-space: nowrap;
+}
+
+@keyframes data-flow {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* Terminal boot effect */
+.terminal-boot {
+    animation: boot-sequence 2s ease-out;
+}
+
+@keyframes boot-sequence {
+    0% {
+        opacity: 0;
+        transform: scale(0.9);
+        filter: blur(10px);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(1.05);
+        filter: blur(5px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+        filter: blur(0);
+    }
+}
+
+/* Hologram effect */
+.hologram {
+    position: relative;
+    animation: hologram-flicker 0.1s infinite;
+}
+
+@keyframes hologram-flicker {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.95;
+    }
+}
+
+.hologram::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        0deg,
+        transparent 0%,
+        rgba(0, 255, 65, 0.03) 50%,
+        transparent 100%
+    );
+    animation: hologram-scan 3s linear infinite;
+}
+
+@keyframes hologram-scan {
+    0% {
+        transform: translateY(-100%);
+    }
+    100% {
+        transform: translateY(100%);
+    }
+}
+
+/* Loading matrix effect */
+.matrix-loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #00ff41;
+    border-radius: 2px;
+    animation: matrix-spin 1s linear infinite;
+}
+
+@keyframes matrix-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Cyberpunk grid overlay */
+.cyber-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    background-image: 
+        linear-gradient(rgba(0, 255, 65, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 65, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-pulse 4s ease-in-out infinite;
+}
+
+@keyframes grid-pulse {
+    0%, 100% {
+        opacity: 0.1;
+    }
+    50% {
+        opacity: 0.2;
+    }
+}
+
+/* Error state effect */
+.error-state {
+    animation: error-glitch 0.5s ease-in-out infinite;
+}
+
+@keyframes error-glitch {
+    0%, 100% {
+        transform: translate(0);
+        filter: hue-rotate(0deg);
+    }
+    25% {
+        transform: translate(-5px, 0);
+        filter: hue-rotate(90deg);
+    }
+    75% {
+        transform: translate(5px, 0);
+        filter: hue-rotate(-90deg);
+    }
+}
