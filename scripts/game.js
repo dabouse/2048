@@ -180,21 +180,30 @@ class Game2048 {
         return moved;
     }
 
-    // Slide and merge array (for row/column)
+    // Slide and merge array (for row/column) - Algorithme correct 2048
     slideAndMerge(arr) {
-        // Remove zeros
+        // Étape 1: Glisser toutes les tuiles vers la direction (supprimer les espaces)
         let newArr = arr.filter(val => val !== 0);
         
-        // Merge equal adjacent tiles
+        // Étape 2: Fusionner les tuiles adjacentes qui ont la même valeur
+        // Une tuile fusionnée ne peut pas fusionner à nouveau dans le même coup
+        let merged = new Array(newArr.length).fill(false);
+        
         for (let i = 0; i < newArr.length - 1; i++) {
-            if (newArr[i] === newArr[i + 1]) {
+            if (!merged[i] && !merged[i + 1] && newArr[i] === newArr[i + 1]) {
+                // Fusionner les deux tuiles
                 newArr[i] *= 2;
                 this.score += newArr[i];
+                merged[i] = true; // Marquer comme fusionnée
+                // La tuile suivante est absorbée
                 newArr.splice(i + 1, 1);
+                merged.splice(i + 1, 1);
+                // Reculer d'un index car on a supprimé un élément
+                i--;
             }
         }
         
-        // Fill with zeros
+        // Étape 3: Remplir avec des zéros à la fin
         while (newArr.length < this.size) {
             newArr.push(0);
         }

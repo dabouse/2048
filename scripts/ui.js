@@ -217,8 +217,10 @@ class UIManager {
 
     // Animate actual tile movements
     animateTileMovements(oldBoard, newBoard, direction, newTile, callback) {
-        const movements = this.calculateMovements(oldBoard, newBoard, direction);
-        const merges = this.calculateMerges(oldBoard, newBoard);
+        // On utilise la nouvelle fonction qui calcule tout avec précision
+        const animations = this.calculateAnimations(oldBoard, direction);
+        const movements = animations.movements;
+        const merges = animations.merges;
         
         this.logDebug(`Animation planning for ${direction}`, {
             movements: movements,
@@ -263,101 +265,73 @@ class UIManager {
         }
     }
 
-    // Calculate tile movements
-    calculateMovements(oldBoard, newBoard, direction) {
+    // Calcule de façon déterministe les animations de mouvement et de fusion
+    calculateAnimations(oldBoard, direction) {
         const movements = [];
-        const processed = new Set();
-        
-        for (let row = 0; row < 4; row++) {
-            for (let col = 0; col < 4; col++) {
-                const oldValue = oldBoard[row][col];
-                const newValue = newBoard[row][col];
-                
-                if (oldValue > 0 && oldValue === newValue && !processed.has(`${row}-${col}`)) {
-                    // Find where this tile came from
-                    const from = this.findTileOrigin(oldBoard, oldValue, row, col, direction);
-                    if (from && (from.row !== row || from.col !== col)) {
-                        movements.push({
-                            from: from,
-                            to: { row, col },
-                            value: oldValue
-                        });
-                        processed.add(`${row}-${col}`);
-                    }
-                }
-            }
-        }
-        
-        return movements;
-    }
-
-    // Calculate tile merges
-    calculateMerges(oldBoard, newBoard) {
         const merges = [];
         
-        for (let row = 0; row < 4; row++) {
-            for (let col = 0; col < 4; col++) {
-                const oldValue = oldBoard[row][col];
-                const newValue = newBoard[row][col];
+        // Helper pour traiter une seule ligne/colonne de manière séquentielle
+        const processLine = (line, getCoords) => {
+            // Étape 1: Ne garder que les tuiles non vides en mémorisant leur index d'origine
+            let nonZeros = line.filter(item => item.value !== 0);
+            
+            // Étape 2: Fusionner les tuiles adjacentes avec les mêmes règles que game.js
+            // Une tuile fusionnée ne peut pas fusionner à nouveau
+            let merged = new Array(nonZeros.length).fill(false);
+            
+            for (let i = 0; i < nonZeros.length - 1; i++) {
+                if (!merged[i] && !merged[i + 1] && nonZeros[i].value === nonZeros[i + 1].value) {
+                    // C'est une fusion
+                    const targetCoords = getCoords(i); // La destination est l'index actuel après glissement
+                    merges.push({
+                        from1: getCoords(nonZeros[i].originalIndex),
+                        from2: getCoords(nonZeros[i + 1].originalIndex),
+                        to: targetCoords,
+                        value: nonZeros[i].value * 2
+                    });
+                    merged[i] = true;
+                    nonZeros.splice(i + 1, 1); // Supprimer la tuile absorbée
+                    merged.splice(i + 1, 1);
+                    i--; // Reculer car on a supprimé un élément
+                }
+            }
+            
+            // Étape 3: Calculer les mouvements simples (tuiles qui ne fusionnent pas)
+            let destIndex = 0;
+            for (let i = 0; i < nonZeros.length; i++) {
+                const targetCoords = getCoords(destIndex);
+                const sourceCoords = getCoords(nonZeros[i].originalIndex);
                 
-                if (newValue > 0 && newValue > oldValue) {
-                    // This is a merge result
-                    const sources = this.findMergeSources(oldBoard, newValue, row, col);
-                    if (sources.length === 2) {
-                        merges.push({
-                            from1: sources[0],
-                            from2: sources[1],
-                            to: { row, col },
-                            value: newValue
-                        });
-                    }
+                // Si la tuile a changé de position, c'est un mouvement
+                if (targetCoords.row !== sourceCoords.row || targetCoords.col !== sourceCoords.col) {
+                    movements.push({
+                        from: sourceCoords,
+                        to: targetCoords,
+                        value: nonZeros[i].value
+                    });
                 }
+                destIndex++;
             }
-        }
-        
-        return merges;
-    }
-
-    // Find where a tile came from
-    findTileOrigin(oldBoard, value, targetRow, targetCol, direction) {
-        // Search in the opposite direction of movement
-        const directions = {
-            'up': { dr: 1, dc: 0 },
-            'down': { dr: -1, dc: 0 },
-            'left': { dr: 0, dc: 1 },
-            'right': { dr: 0, dc: -1 }
         };
-        
-        const { dr, dc } = directions[direction];
-        let row = targetRow;
-        let col = targetCol;
-        
-        // Search backwards
-        while (row >= 0 && row < 4 && col >= 0 && col < 4) {
-            if (oldBoard[row][col] === value && (row !== targetRow || col !== targetCol)) {
-                return { row, col };
-            }
-            row += dr;
-            col += dc;
-        }
-        
-        return null;
-    }
 
-    // Find merge sources
-    findMergeSources(oldBoard, value, targetRow, targetCol) {
-        const sources = [];
-        const halfValue = value / 2;
-        
-        for (let row = 0; row < 4; row++) {
-            for (let col = 0; col < 4; col++) {
-                if (oldBoard[row][col] === halfValue) {
-                    sources.push({ row, col });
-                }
+        for (let i = 0; i < 4; i++) {
+            let line = [];
+            if (direction === 'left') {
+                for (let j = 0; j < 4; j++) line.push({value: oldBoard[i][j], originalIndex: j});
+                processLine(line, (index) => ({row: i, col: index}));
+            } else if (direction === 'right') {
+                for (let j = 3; j >= 0; j--) line.push({value: oldBoard[i][j], originalIndex: j});
+                processLine(line, (index) => ({row: i, col: 3 - index}));
+            } else if (direction === 'up') {
+                for (let j = 0; j < 4; j++) line.push({value: oldBoard[j][i], originalIndex: j});
+                processLine(line, (index) => ({row: index, col: i}));
+            } else if (direction === 'down') {
+                for (let j = 3; j >= 0; j--) line.push({value: oldBoard[j][i], originalIndex: j});
+                processLine(line, (index) => ({row: 3 - index, col: i}));
             }
         }
         
-        return sources;
+        return { movements, merges };
     }
 
     // Render game board
@@ -588,9 +562,10 @@ class UIManager {
     validateGameLogic(oldBoard, newBoard, direction) {
         const errors = [];
         
-        // Check if tiles moved correctly
-        const movements = this.calculateMovements(oldBoard, newBoard, direction);
-        const merges = this.calculateMerges(oldBoard, newBoard);
+        // Use the new calculateAnimations function for validation
+        const animations = this.calculateAnimations(oldBoard, direction);
+        const movements = animations.movements;
+        const merges = animations.merges;
         
         // Count tiles
         const oldTiles = this.countTiles(oldBoard);

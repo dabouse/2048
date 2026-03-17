@@ -1,0 +1,90 @@
+[96m[1m​[22m[39m
+[96m[1mNetlify Build                                                 [22m[39m
+[96m[1m────────────────────────────────────────────────────────────────[22m[39m
+[36m[1m​[22m[39m
+[36m[1m❯ Version[22m[39m
+  @netlify/build 35.8.9
+[36m[1m​[22m[39m
+[36m[1m❯ Flags[22m[39m
+  accountId: 69b9dec8c7aa9de981ba8acb
+  deployId: 69b9df216673b7f924eca708
+[36m[1m​[22m[39m
+[36m[1m❯ Current directory[22m[39m
+  C:\Users\damien\CascadeProjects\2048
+[36m[1m​[22m[39m
+[36m[1m❯ Config file[22m[39m
+  C:\Users\damien\CascadeProjects\2048\netlify.toml
+[36m[1m​[22m[39m
+[36m[1m❯ Context[22m[39m
+  production
+[96m[1m​[22m[39m
+[96m[1mbuild.command from netlify.toml                               [22m[39m
+[96m[1m────────────────────────────────────────────────────────────────[22m[39m
+​
+[36m$ echo 'No build step required'[39m
+'No build step required'
+​
+[90m(build.command completed in 14ms)[39m
+
+Deploying to Netlify
+────────────────────────────────────────────────────────────────
+
+[32mDeploy path: [39m       C:\Users\damien\CascadeProjects\2048
+[32mConfiguration path: [39mC:\Users\damien\CascadeProjects\2048\netlify.toml
+
+⠋ Uploading blobs to deploy store...
+
+✔ Finished uploading blobs to deploy store
+⠋ Hashing files...
+⠋ Looking for a functions cache...
+✔ No cached functions were found
+✔ Finished hashing 
+⠋ CDN diffing files...
+✔ CDN requesting 1 files
+⠋ Uploading 1 files
+ »   Warning: JSONHTTPError: no records matched 422
+ »   Warning: 
+{
+  "name": "JSONHTTPError",
+  "status": 422,
+  "json": {
+    "code": 422,
+    "message": "no records matched"
+  }
+}
+
+[91m[1m​[22m[39m
+[91m[1mInternal error during "options.onPostBuild"                   [22m[39m
+[91m[1m────────────────────────────────────────────────────────────────[22m[39m
+​
+  [31m[1mError message[22m[39m
+  JSONHTTPError: Unprocessable Entity
+​
+  [31m[1mError location[22m[39m
+  During options.onPostBuild
+      at parseResponse (file:///C:/Users/damien/AppData/Roaming/npm/node_modules/netlify-cli/node_modules/@netlify/api/lib/methods/response.js:34:39)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async callMethod (file:///C:/Users/damien/AppData/Roaming/npm/node_modules/netlify-cli/node_modules/@netlify/api/lib/methods/index.js:26:28)
+      at async tryUpload (file:///C:/Users/damien/AppData/Roaming/npm/node_modules/netlify-cli/dist/utils/deploy/upload-files.js:80:29)
+​
+  [31m[1mError properties[22m[39m
+  {
+    name: [32m'JSONHTTPError'[39m,
+    status: [33m422[39m,
+    json: { code: [33m422[39m, message: [32m'no records matched'[39m }
+  }
+​
+  [31m[1mResolved config[22m[39m
+  build:
+    command: echo 'No build step required'
+    commandOrigin: config
+    environment:
+      - NODE_VERSION
+    publish: C:\Users\damien\CascadeProjects\2048
+    publishOrigin: config
+  redirects:
+    - from: /*
+      status: 200
+      to: /index.html
+  redirectsOrigin: config
+ »   Error: Error while running build
